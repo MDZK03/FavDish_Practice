@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.favdish.model.entities.FavDish
 
-@Database(entities = [FavDish::class], version = 1, exportSchema = false)
+@Database(entities = [FavDish::class], version = 1)
 abstract class FavDishRoomDatabase : RoomDatabase() {
     abstract fun favDishDao() : FavDishDao
 
     companion object {
+        @Volatile
         private var INSTANCE: FavDishRoomDatabase? = null
 
         fun getDatabase(context: Context): FavDishRoomDatabase {
@@ -19,7 +20,9 @@ abstract class FavDishRoomDatabase : RoomDatabase() {
                     context.applicationContext,
                     FavDishRoomDatabase::class.java,
                     "fav_dish_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
