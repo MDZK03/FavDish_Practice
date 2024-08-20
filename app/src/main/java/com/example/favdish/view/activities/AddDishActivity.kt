@@ -2,26 +2,23 @@ package com.example.favdish.view.activities
 
 import android.Manifest
 import android.app.Dialog
-import android.content.ActivityNotFoundException
 import android.content.ContentValues
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.favdish.App
 import com.example.favdish.R
 import com.example.favdish.databinding.ActivityAddDishBinding
@@ -33,7 +30,11 @@ import com.example.favdish.view.adapters.ListItemAdapter
 import com.example.favdish.viewmodel.FavDishViewModel
 import com.example.favdish.viewmodel.FavDishViewModelFactory
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
+import java.util.UUID
 
 @Suppress("DEPRECATED_IDENTITY_EQUALS")
 class AddDishActivity : AppCompatActivity(), View.OnClickListener {
@@ -47,30 +48,33 @@ class AddDishActivity : AppCompatActivity(), View.OnClickListener {
         FavDishViewModelFactory((application as App).repository)
     }
 
-
-    private val cameraPermissionLauncher = registerForActivityResult(
+    private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        permissions.entries.forEach {
-            val isGranted = it.value
-            if (isGranted) {
+            if (!permissions.containsValue(false)) {
                 startCamera()
             } else {
-                Toast.makeText(
-                    this,
-                    "Permissions denied. You need to allow permissions to use this feature",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Unable to use this feature, please allow permission(s).", Toast.LENGTH_SHORT).show()
                 Timber.tag("Permissions").d("Permissions denied.")
-            }
         }
     }
+
+    @Suppress("DEPRECATION")
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {result ->
-            val image = addDishBinding.ivDishImage
             if (result.resultCode === RESULT_OK) {
-                val inputImage = uriToBitmap(imageUri)
-                image.setImageBitmap(inputImage)
-        }
+                val inputImage = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
+                Glide.with(this@AddDishActivity)
+                    .load(inputImage)
+                    .centerCrop()
+                    .into(addDishBinding.ivDishImage)
+
+                imageStoragePath = saveImageToInternalStorage(inputImage!!)
+
+                addDishBinding.ivAddDishImage.setImageDrawable(
+                    ContextCompat.getDrawable(this@AddDishActivity, R.drawable.ic_edit)
+                )
+            }
+
     }
 
     private val galleryLauncher = registerForActivityResult(
@@ -227,21 +231,15 @@ class AddDishActivity : AppCompatActivity(), View.OnClickListener {
         dialog.show()
 
         binding.tvCamera.setOnClickListener {
-            val cameraPermissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            when {
-                ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                        == PackageManager.PERMISSION_GRANTED -> { startCamera() }
-                ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.CAMERA) -> { showRationalDialog() }
-                else -> {
-                    cameraPermissionLauncher.launch(cameraPermissions)
-                }
-            }
+            val cameraPermissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissionLauncher.launch(cameraPermissions)
+            dialog.dismiss()
         }
 
         binding.tvGallery.setOnClickListener {
             val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             galleryLauncher.launch(galleryIntent)
+            dialog.dismiss()
         }
     }
 
@@ -255,33 +253,19 @@ class AddDishActivity : AppCompatActivity(), View.OnClickListener {
         cameraLauncher.launch(cameraIntent)
     }
 
-    private fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
-        try {
-            val parcelFileDescriptor = contentResolver.openFileDescriptor(selectedFileUri, "r")
-            val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
-            val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-            parcelFileDescriptor.close()
-            return image
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return null
-    }
+    private fun saveImageToInternalStorage(bitmap: Bitmap): String {
+        val wrapper = ContextWrapper(applicationContext)
 
-    private fun showRationalDialog() {
-        AlertDialog.Builder(this)
-            .setMessage("It Looks like you have turned off permissions required for this feature. It can be enabled in Settings")
-            .setPositiveButton(
-                "GO TO SETTINGS"
-            ) { _, _ ->
-                try {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    val uri = Uri.fromParts("package", packageName, null)
-                    intent.data = uri
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) { e.printStackTrace() }
-            }
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }.show()
+        var file = wrapper.getDir("FavDishImages", Context.MODE_PRIVATE)
+        file = File(file, "${UUID.randomUUID()}.jpg")
+
+        try {
+            val stream: OutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            stream.flush()
+            stream.close()
+        } catch (e: IOException) { e.printStackTrace() }
+        return file.absolutePath
     }
 
     //done
