@@ -3,26 +3,24 @@ package com.example.favdish.view.fragments
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.favdish.App
 import com.example.favdish.R
+import com.example.favdish.base.BaseFragment
 import com.example.favdish.databinding.DialogCustomListBinding
 import com.example.favdish.databinding.FragmentAllDishesBinding
 import com.example.favdish.model.entities.FavDish
 import com.example.favdish.utils.Constants
-import com.example.favdish.view.activities.AddDishActivity
+import com.example.favdish.view.activities.AddEditDishActivity
 import com.example.favdish.view.activities.MainActivity
 import com.example.favdish.view.adapters.DishAdapter
 import com.example.favdish.view.adapters.ListItemAdapter
@@ -30,8 +28,9 @@ import com.example.favdish.viewmodel.FavDishViewModel
 import com.example.favdish.viewmodel.FavDishViewModelFactory
 import timber.log.Timber
 
-class AllDishesFragment : Fragment() {
-    private lateinit var binding: FragmentAllDishesBinding
+class AllDishesFragment : BaseFragment<FragmentAllDishesBinding>(
+    FragmentAllDishesBinding::inflate
+) {
     private lateinit var customDialog: Dialog
     private val favDishViewModel: FavDishViewModel by viewModels {
         FavDishViewModelFactory((requireActivity().application as App).repository)
@@ -50,7 +49,7 @@ class AllDishesFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_add_dish -> {
-                        startActivity(Intent(requireActivity(),AddDishActivity::class.java))
+                        startActivity(Intent(requireActivity(),AddEditDishActivity::class.java))
                         true
                     }
                     R.id.action_filter_dishes -> {
@@ -61,15 +60,6 @@ class AllDishesFragment : Fragment() {
                 }
             }
         })
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-            binding = FragmentAllDishesBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

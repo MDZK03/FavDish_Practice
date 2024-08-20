@@ -1,14 +1,12 @@
 package com.example.favdish.view.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.favdish.App
+import com.example.favdish.base.BaseFragment
 import com.example.favdish.databinding.FragmentFavoriteBinding
 import com.example.favdish.model.entities.FavDish
 import com.example.favdish.view.activities.MainActivity
@@ -16,23 +14,13 @@ import com.example.favdish.view.adapters.DishAdapter
 import com.example.favdish.viewmodel.FavDishViewModel
 import com.example.favdish.viewmodel.FavDishViewModelFactory
 
-class FavoriteFragment : Fragment() {
-
-    private var _binding: FragmentFavoriteBinding? = null
-    private val binding get() = _binding!!
+class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(
+    FragmentFavoriteBinding::inflate
+) {
     private val favDishViewModel: FavDishViewModel by viewModels {
         FavDishViewModelFactory((requireActivity().application as App).repository)
     }
     private lateinit var dishAdapter: DishAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,10 +48,6 @@ class FavoriteFragment : Fragment() {
         if (requireActivity() is MainActivity) {
             (activity as MainActivity?)!!.showBottomNavigationView()
         }
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     fun getDishDetails(favDish: FavDish) {
