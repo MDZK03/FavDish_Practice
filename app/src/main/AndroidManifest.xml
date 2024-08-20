@@ -28,7 +28,7 @@
             android:name=".base.BaseActivity"
             android:exported="false" />
         <activity
-            android:name=".view.activities.AddDishActivity"
+            android:name=".view.activities.AddEditDishActivity"
             android:exported="false"
             android:theme="@style/Theme.FavDish.NoActionBar" />
         <activity

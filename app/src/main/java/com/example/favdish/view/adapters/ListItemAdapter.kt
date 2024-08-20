@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.favdish.databinding.ItemCustomListBinding
-import com.example.favdish.view.activities.AddDishActivity
+import com.example.favdish.view.activities.AddEditDishActivity
 import com.example.favdish.view.fragments.AllDishesFragment
 
 class ListItemAdapter(
@@ -30,7 +30,7 @@ class ListItemAdapter(
 
         holder.itemView.setOnClickListener {
 
-            if (activity is AddDishActivity) {
+            if (activity is AddEditDishActivity) {
                 activity.selectedListItem(item, selection)
             }
 

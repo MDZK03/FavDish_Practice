@@ -20,7 +20,7 @@ import com.example.favdish.databinding.DialogCustomListBinding
 import com.example.favdish.databinding.FragmentAllDishesBinding
 import com.example.favdish.model.entities.FavDish
 import com.example.favdish.utils.Constants
-import com.example.favdish.view.activities.AddDishActivity
+import com.example.favdish.view.activities.AddEditDishActivity
 import com.example.favdish.view.activities.MainActivity
 import com.example.favdish.view.adapters.DishAdapter
 import com.example.favdish.view.adapters.ListItemAdapter
@@ -49,7 +49,7 @@ class AllDishesFragment : BaseFragment<FragmentAllDishesBinding>(
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_add_dish -> {
-                        startActivity(Intent(requireActivity(),AddDishActivity::class.java))
+                        startActivity(Intent(requireActivity(),AddEditDishActivity::class.java))
                         true
                     }
                     R.id.action_filter_dishes -> {
