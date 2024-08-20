@@ -41,10 +41,10 @@
     <string name="label_no_dishes">No dishes added.</string>
     <string name="label_no_favorite_dishes">No favorite dishes added.</string>
 
-    <string name="msg_added_to_favorite">You have added the dish to your favorites.</string>
-    <string name="msg_removed_from_favorite">You have removed the dish from your favorites.</string>
-    <string name="msg_delete_dish_dialog">Are you sure you wants to delete %1$.</string>
-    <string name="msg_already_added_to_favorite">You have already added the dish to your favorites.</string>
+    <string name="msg_add_favorite">You have added the dish to your favorites.</string>
+    <string name="msg_remove_favorite">You have removed the dish from your favorites.</string>
+    <string name="msg_delete_dialog">Are you sure you wants to delete %1$.</string>
+    <string name="msg_already_added">You have already added the dish to your favorites.</string>
 
     <string name="action_edit_dish">EDIT DISH</string>
     <string name="action_delete_dish">DELETE DISH</string>

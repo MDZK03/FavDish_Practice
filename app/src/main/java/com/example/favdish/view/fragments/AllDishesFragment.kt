@@ -82,14 +82,13 @@ class AllDishesFragment : Fragment() {
 
         favDishViewModel.allDishesList.observe(viewLifecycleOwner) { dishes ->
             dishes.let {
-                if (it.isNotEmpty()) {
+                if (it.isEmpty()) {
+                    binding.rvDishesList.visibility = View.GONE
+                    binding.tvNoDish.visibility = View.VISIBLE
+                } else {
                     binding.rvDishesList.visibility = View.VISIBLE
                     binding.tvNoDish.visibility = View.GONE
                     dishAdapter.dishesList(it)
-
-                } else {
-                    binding.rvDishesList.visibility = View.GONE
-                    binding.tvNoDish.visibility = View.VISIBLE
                 }
             }
         }
