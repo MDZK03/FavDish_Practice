@@ -11,14 +11,15 @@ import android.view.WindowInsets
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.example.favdish.R
+import com.example.favdish.base.BaseActivity
 import com.example.favdish.databinding.ActivitySplashBinding
 
 @SuppressLint("CustomSplashScreen")
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseActivity<ActivitySplashBinding>(
+    ActivitySplashBinding::inflate
+) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val splashBinding : ActivitySplashBinding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(splashBinding.root)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.hide(WindowInsets.Type.statusBars())
@@ -43,6 +44,6 @@ class SplashActivity : AppCompatActivity() {
 
         })
 
-        splashBinding.tvSplashTitle.animation = splashAnimation
+        binding.tvSplashTitle.animation = splashAnimation
     }
 }
