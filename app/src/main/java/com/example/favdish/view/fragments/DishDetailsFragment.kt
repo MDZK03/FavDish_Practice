@@ -1,16 +1,12 @@
 package com.example.favdish.view.fragments
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.safe.args.generator.ext.capitalize
-import com.bumptech.glide.Glide
 import com.example.favdish.App
 import com.example.favdish.R
 import com.example.favdish.base.BaseFragment
@@ -34,9 +30,7 @@ class DishDetailsFragment : BaseFragment<FragmentDishDetailsBinding>(
 
         args.let {
             try {
-                Glide.with(requireActivity())
-                    .load(args.dishDetails.image)
-                    .into(binding.ivDishImage)
+                binding.ivDishImage.setImageDrawable(Drawable.createFromPath(it.dishDetails.image))
             } catch (e: IOException) {
                 e.printStackTrace()
             }

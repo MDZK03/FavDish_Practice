@@ -17,7 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.example.favdish.App
 import com.example.favdish.R
 import com.example.favdish.base.BaseActivity
@@ -63,10 +62,7 @@ class AddEditDishActivity : View.OnClickListener, BaseActivity<ActivityAddEditDi
         ActivityResultContracts.StartActivityForResult()) {result ->
             if (result.resultCode === RESULT_OK) {
                 val inputImage = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
-                Glide.with(this@AddEditDishActivity)
-                    .load(inputImage)
-                    .centerCrop()
-                    .into(binding.ivDishImage)
+                binding.ivDishImage.setImageBitmap(inputImage)
 
                 imageStoragePath = saveImageToInternalStorage(inputImage!!)
 
