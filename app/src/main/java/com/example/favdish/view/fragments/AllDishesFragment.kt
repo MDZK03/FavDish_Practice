@@ -3,32 +3,31 @@ package com.example.favdish.view.fragments
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.favdish.App
 import com.example.favdish.R
 import com.example.favdish.databinding.DialogCustomListBinding
 import com.example.favdish.databinding.FragmentAllDishesBinding
+import com.example.favdish.model.entities.FavDish
 import com.example.favdish.utils.Constants
 import com.example.favdish.view.activities.AddDishActivity
+import com.example.favdish.view.activities.MainActivity
 import com.example.favdish.view.adapters.DishAdapter
 import com.example.favdish.view.adapters.ListItemAdapter
 import com.example.favdish.viewmodel.FavDishViewModel
 import com.example.favdish.viewmodel.FavDishViewModelFactory
-import com.example.favdish.viewmodel.HomeViewModel
 import timber.log.Timber
 
 class AllDishesFragment : Fragment() {
@@ -96,6 +95,12 @@ class AllDishesFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (requireActivity() is MainActivity) {
+            (activity as MainActivity?)!!.showBottomNavigationView()
+        }
+    }
 
     private fun filterDishesListDialog() {
         customDialog = Dialog(requireActivity())
@@ -139,5 +144,12 @@ class AllDishesFragment : Fragment() {
             }
         } else {
         }
+    }
+
+    fun getDishDetails(favDish: FavDish) {
+        if (requireActivity() is MainActivity) {
+            (activity as MainActivity?)!!.hideBottomNavigationView()
+        }
+        findNavController().navigate(AllDishesFragmentDirections.actionAllDishesToDishDetails(favDish))
     }
 }

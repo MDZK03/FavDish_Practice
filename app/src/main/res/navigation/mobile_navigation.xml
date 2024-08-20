@@ -8,18 +8,37 @@
     <fragment
         android:id="@+id/navigation_all_dishes"
         android:name="com.example.favdish.view.fragments.AllDishesFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_all_dishes" />
+        android:label="@string/title_all_dishes"
+        tools:layout="@layout/fragment_all_dishes" >
+        <action
+            android:id="@+id/action_all_dishes_to_dish_details"
+            app:destination="@id/navigation_dish_details" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_favorite"
         android:name="com.example.favdish.view.fragments.FavoriteFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_favorite" />
+        android:label="@string/title_favorite_dishes"
+        tools:layout="@layout/fragment_favorite" >
+        <action
+            android:id="@+id/action_favorite_to_dish_details"
+            app:destination="@id/navigation_dish_details" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_random"
         android:name="com.example.favdish.view.fragments.RandomDishFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_random_dish"
         tools:layout="@layout/fragment_random" />
+
+    <fragment
+        android:id="@+id/navigation_dish_details"
+        android:name="com.example.favdish.view.fragments.DishDetailsFragment"
+        android:label="Dish Details"
+        tools:layout="@layout/fragment_dish_details">
+        <argument
+            android:name="dishDetails"
+            app:argType="com.example.favdish.model.entities.FavDish"
+            />
+    </fragment>
 </navigation>

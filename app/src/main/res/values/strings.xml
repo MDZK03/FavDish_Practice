@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">FavDish</string>
 
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_all_dishes">All Dishes</string>
+    <string name="title_favorite_dishes">Favorite</string>
+    <string name="title_random_dish">Random Dish</string>
     <string name="add_dish">Add Dish</string>
 
     <string name="img_content_description">image</string>
@@ -38,8 +38,8 @@
     <string name="err_msg_select_dish_cooking_time">Select dish cooking time.</string>
     <string name="err_msg_enter_dish_cooking_instructions">Enter dish cooking instructions.</string>
 
-    <string name="label_no_dishes_added_yet">No dishes added yet!!!</string>
-    <string name="label_no_favorite_dishes_added_yet">No favorite dishes added yet!!!</string>
+    <string name="label_no_dishes">No dishes added.</string>
+    <string name="label_no_favorite_dishes">No favorite dishes added.</string>
 
     <string name="msg_added_to_favorite">You have added the dish to your favorites.</string>
     <string name="msg_removed_from_favorite">You have removed the dish from your favorites.</string>
@@ -51,6 +51,8 @@
     <string name="action_filter_dishes">Filter Dishes</string>
     <string name="action_share_dish">Share Dish</string>
 
+    <string name="lbl_estimate_cooking_time">The approx time required to cook the dish is %1$s minutes.</string>
+
     <string name="notification_title">Checkout new dish recipes</string>
     <string name="notification_subtitle">Tap for more detail</string>
 
@@ -60,5 +62,7 @@
     <string name="start_capture">Start Capture</string>
     <string name="take_photo">Take Photo</string>
     <string name="image_contentDescription">Content Description</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
