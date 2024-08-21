@@ -1,5 +1,6 @@
 package com.example.favdish.view.fragments
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -123,8 +124,8 @@ class AllDishesFragment : BaseFragment<FragmentAllDishesBinding>(
                     if (it.isNotEmpty()) {
                         binding.rvDishesList.visibility = View.VISIBLE
                         binding.tvNoDish.visibility = View.GONE
-                        dishAdapter.dishesList(it)
 
+                        dishAdapter.dishesList(it)
                     } else {
                         binding.rvDishesList.visibility = View.GONE
                         binding.tvNoDish.visibility = View.VISIBLE
@@ -132,13 +133,43 @@ class AllDishesFragment : BaseFragment<FragmentAllDishesBinding>(
                 }
             }
         } else {
+            favDishViewModel.filteredList(filterItemSelection).observe(viewLifecycleOwner) { dishes ->
+                dishes.let {
+                    if (it.isNotEmpty()) {
+                        binding.rvDishesList.visibility = View.VISIBLE
+                        binding.tvNoDish.visibility = View.GONE
+
+                        dishAdapter.dishesList(it)
+                    } else {
+                        binding.rvDishesList.visibility = View.GONE
+                        binding.tvNoDish.visibility = View.VISIBLE
+                    }
+                }
+            }
         }
     }
 
-    fun getDishDetails(favDish: FavDish) {
+    fun getDishDetails(dish: FavDish) {
         if (requireActivity() is MainActivity) {
             (activity as MainActivity?)!!.hideBottomNavigationView()
         }
-        findNavController().navigate(AllDishesFragmentDirections.actionAllDishesToDishDetails(favDish))
+        findNavController().navigate(AllDishesFragmentDirections.actionAllDishesToDishDetails(dish))
+    }
+
+    fun deleteDish(dish: FavDish) {
+        val alertBuilder = AlertDialog.Builder(requireActivity())
+        alertBuilder.setTitle(resources.getString(R.string.title_delete_dish))
+        alertBuilder.setMessage(resources.getString(R.string.msg_delete_dialog))
+        alertBuilder.setIcon(android.R.drawable.ic_dialog_alert)
+        alertBuilder.setPositiveButton(resources.getString(R.string.lbl_yes)){ dialogInterface, _ ->
+            favDishViewModel.delete(dish)
+            dialogInterface.dismiss()
+        }
+        alertBuilder.setNegativeButton(resources.getString(R.string.lbl_no)){ dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+
+        val alertDialog = alertBuilder.create()
+        alertDialog.show()
     }
 }

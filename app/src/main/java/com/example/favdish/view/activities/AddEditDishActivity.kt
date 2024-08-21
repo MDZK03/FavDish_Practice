@@ -7,12 +7,16 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -35,7 +39,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.UUID
 
-@Suppress("DEPRECATED_IDENTITY_EQUALS")
+@Suppress("DEPRECATED_IDENTITY_EQUALS", "DEPRECATION")
 class AddEditDishActivity : View.OnClickListener, BaseActivity<ActivityAddEditDishBinding>(
     ActivityAddEditDishBinding::inflate
 ) {
@@ -57,35 +61,69 @@ class AddEditDishActivity : View.OnClickListener, BaseActivity<ActivityAddEditDi
         }
     }
 
-    @Suppress("DEPRECATION")
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {result ->
             if (result.resultCode === RESULT_OK) {
-                val inputImage = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
-                binding.ivDishImage.setImageBitmap(inputImage)
+                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val source = ImageDecoder.createSource(this.contentResolver, imageUri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+                }
+                binding.ivDishImage.setImageBitmap(bitmap)
 
-                imageStoragePath = saveImageToInternalStorage(inputImage!!)
+                imageStoragePath = saveImageToInternalStorage(bitmap)
 
                 binding.ivAddDishImage.setImageDrawable(
-                    ContextCompat.getDrawable(this@AddEditDishActivity, R.drawable.ic_edit)
-                )
-            }
-
-    }
-
-    private val galleryLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()) { result ->
-            val image = binding.ivDishImage
-            if (result.resultCode === RESULT_OK) {
-                val imageUri = result.data!!.data
-                image.setImageURI(imageUri)
+                    ContextCompat.getDrawable(this@AddEditDishActivity, R.drawable.ic_edit))
+            } else {
+                Toast.makeText(this, "Nothing was selected.", Toast.LENGTH_SHORT).show()
             }
         }
 
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val source = ImageDecoder.createSource(this.contentResolver, uri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                }
+                binding.ivDishImage.setImageBitmap(bitmap)
+
+                imageStoragePath = saveImageToInternalStorage(bitmap)
+
+                binding.ivAddDishImage.setImageDrawable(
+                    ContextCompat.getDrawable(this@AddEditDishActivity, R.drawable.ic_edit))
+            } else {
+                Toast.makeText(this, "Nothing was selected.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (intent.hasExtra(Constants.EXTRA_DISH_DETAILS)) {
+            dishDetails = intent.getParcelableExtra(Constants.EXTRA_DISH_DETAILS)
+        }
+
         setUpActionBar()
 
+        dishDetails?.let {
+            if (it.id != 0) {
+                imageStoragePath = it.image
+                binding.ivDishImage.setImageDrawable(Drawable.createFromPath(imageStoragePath))
+                binding.etTitle.setText(it.title)
+                binding.etType.setText(it.type)
+                binding.etCategory.setText(it.category)
+                binding.etIngredients.setText(it.ingredients)
+                binding.etCookingTime.setText(it.cookingTime)
+                binding.etDirectionToCook.setText(it.directionToCook)
+
+                binding.btnAddDish.text = resources.getString(R.string.lbl_update_dish)
+            }
+        }
         binding.ivAddDishImage.setOnClickListener(this@AddEditDishActivity)
         binding.etType.setOnClickListener(this@AddEditDishActivity)
         binding.etCategory.setOnClickListener(this@AddEditDishActivity)
@@ -196,14 +234,33 @@ class AddEditDishActivity : View.OnClickListener, BaseActivity<ActivityAddEditDi
                         }
 
                         else -> {
+                            var id = 0
+                            var imageSource = Constants.DISH_IMAGE_SOURCE_LOCAL
+                            var favoriteCheck = false
+
+                            dishDetails?.let {
+                                if (it.id != 0) {
+                                    id = it.id
+                                    imageSource = it.imageSource
+                                    favoriteCheck = it.favoriteDish
+                                }
+                            }
+
                             val favDishDetails = FavDish(
                                 imageStoragePath,
-                                Constants.DISH_IMAGE_SOURCE_LOCAL,
+                                imageSource,
                                 title, type, category, ingredients, cookingTimeInMinutes,
-                                cookingDirection, false
+                                cookingDirection, favoriteCheck, id
                             )
-                            favDishViewModel.insert(favDishDetails)
-                            Toast.makeText(this,"Added successfully", Toast.LENGTH_SHORT).show()
+
+                            if (id == 0) {
+                                favDishViewModel.insert(favDishDetails)
+                                Toast.makeText(this,"Dish added successfully", Toast.LENGTH_SHORT).show()
+                            } else {
+                                favDishViewModel.update(favDishDetails)
+                                Toast.makeText(this,"Updated successfully", Toast.LENGTH_SHORT).show()
+                            }
+
                             finish()
                         }
                     }
@@ -213,6 +270,13 @@ class AddEditDishActivity : View.OnClickListener, BaseActivity<ActivityAddEditDi
 
     private fun setUpActionBar() {
         setSupportActionBar(binding.tbrAddDish)
+
+        if (dishDetails != null && dishDetails!!.id != 0) {
+            supportActionBar?.let { it.title = resources.getString(R.string.title_edit_dish) }
+        } else {
+            supportActionBar?.let { it.title = resources.getString(R.string.title_add_dish) }
+        }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
         binding.tbrAddDish.setNavigationOnClickListener{onBackPressedDispatcher.onBackPressed()}
@@ -232,8 +296,7 @@ class AddEditDishActivity : View.OnClickListener, BaseActivity<ActivityAddEditDi
         }
 
         binding.tvGallery.setOnClickListener {
-            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            galleryLauncher.launch(galleryIntent)
+            galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             dialog.dismiss()
         }
     }

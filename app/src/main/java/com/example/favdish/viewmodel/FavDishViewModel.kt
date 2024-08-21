@@ -11,16 +11,23 @@ import kotlinx.coroutines.launch
 
 class FavDishViewModel(private val repository: FavDishRepository) : ViewModel() {
     fun insert(dish: FavDish) = viewModelScope.launch {
-        repository.insertFavDishData(dish)
+        repository.insertDishData(dish)
     }
 
     val allDishesList: LiveData<List<FavDish>> = repository.allDishesList.asLiveData()
 
     fun update(dish: FavDish) = viewModelScope.launch {
-        repository.updateFavDishData(dish)
+        repository.updateDishData(dish)
     }
 
     val favDishesList: LiveData<List<FavDish>> = repository.favDishesList.asLiveData()
+
+    fun delete(dish: FavDish) = viewModelScope.launch {
+        repository.deleteDish(dish)
+    }
+
+    fun filteredList(filter: String): LiveData<List<FavDish>> = repository.getFilteredList(filter).asLiveData()
+
 }
 
 class FavDishViewModelFactory(private val repository: FavDishRepository) : ViewModelProvider.Factory {
