@@ -62,6 +62,8 @@
     <string name="start_capture">Start Capture</string>
     <string name="take_photo">Take Photo</string>
     <string name="image_contentDescription">Content Description</string>
+    <string name="lbl_other">Other</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

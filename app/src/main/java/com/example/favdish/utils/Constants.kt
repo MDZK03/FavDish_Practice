@@ -11,7 +11,7 @@ object Constants {
     const val ALL_ITEMS: String = "All"
     const val FILTER_SELECTION: String = "FilterSelection"
     const val API_ENDPOINT: String = "recipes/random"
-    const val API_KEY_VALUE: String = "Write your own api key here"
+    const val API_KEY_VALUE: String = "433b42674ee94a64ad420e101000eb79"
     const val API_KEY: String = "apiKey"
     const val LIMIT_LICENSE: String = "limitLicense"
     const val TAGS: String = "tags"
@@ -28,14 +28,14 @@ object Constants {
     fun dishTypes(): ArrayList<String> {
         val list = ArrayList<String>()
 
-        list.add("breakfast")
-        list.add("lunch")
-        list.add("snacks")
-        list.add("dinner")
-        list.add("salad")
-        list.add("side dish")
-        list.add("desert")
-        list.add("other")
+        list.add("Breakfast")
+        list.add("Lunch")
+        list.add("Snacks")
+        list.add("Dinner")
+        list.add("Salad")
+        list.add("Side dish")
+        list.add("Dessert")
+        list.add("Other")
 
         return list
     }
@@ -64,6 +64,7 @@ object Constants {
     fun dishCookTime(): ArrayList<String> {
         val list = ArrayList<String>()
 
+        list.add("5")
         list.add("10")
         list.add("15")
         list.add("20")

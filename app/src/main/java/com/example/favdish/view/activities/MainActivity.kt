@@ -1,6 +1,7 @@
 package com.example.favdish.view.activities
 
 import android.os.Bundle
+import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -38,10 +39,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(
     fun hideBottomNavigationView() {
         binding.navView.clearAnimation()
         binding.navView.animate().translationY(binding.navView.height.toFloat()).duration = 500
+        binding.navView.visibility = View.GONE
     }
 
     fun showBottomNavigationView() {
         binding.navView.clearAnimation()
         binding.navView.animate().translationY(0f).duration = 500
+        binding.navView.visibility = View.VISIBLE
     }
 }
